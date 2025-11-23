@@ -4,6 +4,8 @@ import { z } from "zod";
 import postgres from "postgres";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
+import { signIn } from "../../auth";
+import { AuthError } from "next-auth";
 
 // const sql = await postgres(process.env.POSTGRES_URL!, { ssl: "require" });
 const sql = postgres(process.env.POSTGRES_URL!);
@@ -108,4 +110,23 @@ export async function deleteInvoice(id: string) {
     return { message: "Database Error: Failed to Delete Invoice" };
   }
   revalidatePath("/dashboard/invoices");
+}
+
+export async function authenticated(
+  prevState: string | undefined,
+  formData: FormData
+) {
+  try {
+    await signIn("credentials", formData);
+  } catch (error) {
+    if (error instanceof AuthError) {
+      switch (error.type) {
+        case "CredentialsSignin":
+          return "Invalid Credentials.";
+        default:
+          return "Something went wrong.";
+      }
+    }
+    throw error;
+  }
 }
