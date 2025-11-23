@@ -7,8 +7,11 @@ import { revalidatePath } from "next/cache";
 import { signIn } from "../../auth";
 import { AuthError } from "next-auth";
 
-// const sql = await postgres(process.env.POSTGRES_URL!, { ssl: "require" });
-const sql = postgres(process.env.POSTGRES_URL!);
+let sql: postgres.Sql;
+
+if (process.env.NODE_ENV === "development")
+  sql = postgres(process.env.POSTGRES_URL!);
+else sql = postgres(process.env.POSTGRES_URL!, { ssl: "require" });
 
 const FormSchema = z.object({
   id: z.string(),

@@ -9,8 +9,11 @@ import {
 } from './definitions';
 import { formatCurrency } from './utils';
 
-// const sql = postgres(process.env.POSTGRES_URL!, { ssl: 'require' });
-const sql = postgres(process.env.POSTGRES_URL!);
+let sql: postgres.Sql;
+
+if (process.env.NODE_ENV === "development")
+  sql = postgres(process.env.POSTGRES_URL!);
+else sql = postgres(process.env.POSTGRES_URL!, { ssl: "require" });
 
 export async function fetchRevenue() {
   try {

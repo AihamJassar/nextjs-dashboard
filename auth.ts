@@ -5,8 +5,12 @@ import { z } from "zod";
 import postgres from "postgres";
 import { User } from "./app/lib/definitions";
 import bcrypt from "bcrypt";
-// const sql = postgres(process.env.POSTGRES_URL!, {ssl: 'require'})
-const sql = postgres(process.env.POSTGRES_URL!);
+
+let sql: postgres.Sql;
+
+if (process.env.NODE_ENV === "development")
+  sql = postgres(process.env.POSTGRES_URL!);
+else sql = postgres(process.env.POSTGRES_URL!, { ssl: "require" });
 
 async function getUser(email: string): Promise<User | undefined> {
   try {
